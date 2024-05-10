@@ -1,4 +1,4 @@
-package com.fernandez.batchtest.job;
+package com.fernandez.statsmatch.job;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;

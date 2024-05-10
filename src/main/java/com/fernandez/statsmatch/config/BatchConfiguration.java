@@ -1,8 +1,9 @@
-package com.fernandez.batchtest.config;
+package com.fernandez.statsmatch.config;
 
-import com.fernandez.batchtest.model.dto.ResultsBean;
-import com.fernandez.batchtest.model.entity.Results;
-import com.fernandez.batchtest.writer.ConsoleItemWriter;
+import com.fernandez.statsmatch.model.dto.StatsMatchBean;
+import com.fernandez.statsmatch.model.entity.StatsMatch;
+import com.fernandez.statsmatch.reader.CsvItemReader;
+import com.fernandez.statsmatch.writer.ConsoleItemWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -13,14 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import com.fernandez.batchtest.decorator.ThreadLoggingTaskDecorator;
-import com.fernandez.batchtest.job.MyJobListener;
-import com.fernandez.batchtest.processor.CsvItemProcessor;
-import com.fernandez.batchtest.reader.CsvItemReader;
+import com.fernandez.statsmatch.decorator.ThreadLoggingTaskDecorator;
+import com.fernandez.statsmatch.job.MyJobListener;
+import com.fernandez.statsmatch.processor.CsvItemProcessor;
 
 @Configuration
 @EnableBatchProcessing
@@ -40,25 +39,25 @@ public class BatchConfiguration {
 
     @Autowired
     private ConsoleItemWriter consoleItemWriter;
-    
+
     @Autowired
     private MyJobListener myJobListener;
 
     @Value("${batch.taskExecutor.corePoolSize:1}")
     private int corePoolSize;
 
-    @Value("${batch.taskExecutor.maxPoolSize:2}")
+    @Value("${batch.taskExecutor.maxPoolSize:1}")
     private int maxPoolSize;
 
-    @Value("${batch.taskExecutor.queueCapacity:2}")
+    @Value("${batch.taskExecutor.queueCapacity:1}")
     private int queueCapacity;
-    
-    @Value("${chunk:2}")
+
+    @Value("${chunk:1000}")
     private int chunk;
 
     @Bean
     public Job myJob() {
-        return jobBuilderFactory.get("myJob")
+        return jobBuilderFactory.get("statsMatchJob")
                 .incrementer(new RunIdIncrementer())
                 .listener(myJobListener)
                 .start(myStep())
@@ -67,8 +66,8 @@ public class BatchConfiguration {
 
     @Bean
     public Step myStep() {
-        return stepBuilderFactory.get("myStep")
-                .<ResultsBean, Results>chunk(chunk)
+        return stepBuilderFactory.get("myStepStatsMatch")
+                .<StatsMatchBean, StatsMatch>chunk(chunk)
                 .reader(csvItemReader)
                 .processor(csvItemProcessor)
                 .writer(consoleItemWriter)
@@ -82,7 +81,7 @@ public class BatchConfiguration {
         taskExecutor.setCorePoolSize(corePoolSize);
         taskExecutor.setMaxPoolSize(maxPoolSize);
         taskExecutor.setQueueCapacity(queueCapacity);
-        taskExecutor.setThreadNamePrefix("my-batch-thread-");
+        taskExecutor.setThreadNamePrefix("my-batch-thread-statsMatch");
         taskExecutor.setTaskDecorator(new ThreadLoggingTaskDecorator());
         return taskExecutor;
     }

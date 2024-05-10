@@ -1,13 +1,13 @@
-package com.fernandez.batchtest;
+package com.fernandez.statsmatch;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BatchtestApplication {
+public class StatsMatchApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(BatchtestApplication.class, args);
+        SpringApplication.run(StatsMatchApplication.class, args);
     }
 
 }
